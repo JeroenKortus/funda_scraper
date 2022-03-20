@@ -74,8 +74,10 @@ def complete_check():
     complete_listings = check_for_new_listing(fetched_listings, old_listings)
     clear_and_write_json(filename, complete_listings)
 
-if __name__ == "__main__":
-    schedule.every(15).minutes.do(complete_check)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+complete_check()
+
+# if __name__ == "__main__":
+#     schedule.every(15).minutes.do(complete_check)
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
