@@ -22,6 +22,7 @@ class FundaSpider(scrapy.Spider):
             yield {
                 'text': lstng
             }
+
 def run_spider(spider):
     FundaJob = Job(spider)
     processor = Processor(settings=None)
