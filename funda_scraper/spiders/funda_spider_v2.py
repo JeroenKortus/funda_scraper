@@ -9,7 +9,7 @@ import time
 
 ######## SCRAPY SPIDER FUNCTIONS #######
 class FundaSpider(Spider):
-    name = 'fundaspiderv3'
+    name = 'fundaspiderv2'
 
     def parse(self, response):
         for lstng in response.css(".search-result").getall():
