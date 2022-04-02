@@ -12,8 +12,7 @@ import time
 class FundaSpider(scrapy.Spider):
     name = 'fundaspiderv1'
     start_urls = ['https://www.funda.nl/koop/gemeente-den-bosch/200000-400000/dakterras/tuin/sorteer-datum-af/',
-                  'https://www.funda.nl/koop/gemeente-vught/200000-400000/dakterras/tuin/sorteer-datum-af/',
-                  'https://www.funda.nl/koop/gemeente-sint-michielsgestel/200000-400000/dakterras/tuin/sorteer-datum-af/']
+                  'https://www.funda.nl/koop/gemeente-vught/200000-400000/dakterras/tuin/sorteer-datum-af/']
     LOG_LEVEL = 'INFO'
     LOG_ENABLED = False
 
