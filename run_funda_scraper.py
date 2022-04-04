@@ -97,8 +97,7 @@ def periodic_checker(database, url_list, token, send_notification, open_links):
             webbrowser.open(listing['url'])
 
     # write new list of listings if new listing(s) found
-    if not new_listings:
-        write_json(database, all_listings)
+    write_json(database, all_listings)
 
 ############### VARIABLES ##############
 one_loop =          config.ONE_LOOP
