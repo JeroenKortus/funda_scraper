@@ -72,12 +72,13 @@ def run_spider(spider, url_list):
     return [dict(x) for x in fetched_listings]
 
 ############ MAIN FUNCTION #############
-def periodic_checker(database, url_list, token, open_links):
+def periodic_checker(database, url_list, token, send_notification, open_links):
     '''main function to run spider and send notification if new listing is found'''
     saved_listings = read_json(database)
 
     # overwrite if database is empty.
     open_links = False if not saved_listings else open_links
+    send_notification = False if not saved_listings else send_notification
 
     # Run spider and check for new listings
     fetched_listings = run_spider(FundaSpider, url_list)
@@ -100,22 +101,22 @@ def periodic_checker(database, url_list, token, open_links):
         write_json(database, all_listings)
 
 ############### VARIABLES ##############
-one_loop = True
-open_links = True
-send_notification = True
-database = "listing_database.jsonl"
-url_list = ['https://www.funda.nl/koop/gemeente-den-bosch/200000-400000/dakterras/tuin/sorteer-datum-af/',
-            'https://www.funda.nl/koop/gemeente-vught/200000-400000/dakterras/tuin/sorteer-datum-af/']
-token = config.PUSHBULLET_TOKEN
+one_loop =          config.ONE_LOOP
+open_links =        config.OPEN_LINKS
+send_notification = config.SEND_NOTIFICATION
+database =          config.DATABASE
+url_list =          config.URL_LIST
+token =             config.PUSHBULLET_TOKEN
 
 ############## MAIN LOOP ###############
 if __name__ == "__main__":
 
     if one_loop:
-        periodic_checker(database, url_list, token, open_links)
+        periodic_checker(database, url_list, token, send_notification, open_links)
     else:
         schedule.every(15).minutes.do(periodic_checker, database = database, url_list = url_list, 
-                                                        token = token, open_links=open_links)
+                                                        token = token, send_notification=send_notification, 
+                                                        open_links=open_links)
         while True:
             schedule.run_pending()
             time.sleep(1)
