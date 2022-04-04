@@ -7,26 +7,29 @@ import webbrowser
 import schedule, time
 
 ############ JSON FUNCTIONS ############
-def clear_json(filename):
-   f = open(filename, "r+")
-   f.seek(0)
-   f.truncate()
-   f.close()
-
 def write_json(filename, listings):
-   json_string = json.dumps(listings)
-   with open(filename, 'w') as outfile:
-       outfile.write(json_string)
+    '''function write dictionaries to jsonl file, overwrites current data'''
+    with open(filename, 'w') as outfile:
+        for entry in listings:
+            json.dump(entry, outfile)
+            outfile.write('\n')
 
 def read_json(filename):
-    f = open(filename)
-    saved_listings = json.load(f)
-    f.close()
+    '''function to read jsonl file and turn to dictionaries'''
+    # read data and add to list
+    with open(filename, 'r') as json_file:
+        json_list = list(json_file)
+
+    # turn items in list to dictionaries
+    saved_listings = []
+    for json_str in json_list:
+        result = json.loads(json_str)
+        saved_listings.append(result)
     return saved_listings
 
 ###### PUSH NOTIFICATION FUNCTION ######
-def pushbullet_noti(title, body, token):
-
+def pushbullet_notification(title, body, token):
+    '''function to send notification to pushbullet app'''
     # Make a dictionary that includes, title and body
     msg = {"type": "note", "title": title, "body": body}
 
@@ -43,50 +46,64 @@ def pushbullet_noti(title, body, token):
 
 ###### LISTING COMPARISON FUNCTION #####
 def check_new_listings(spider_output, all_listings):
+    '''function to compare spider output to listings in database and detect new ones'''
+    # make list of adressnames 
+    all_listing_names = [x['street_name'] for x in all_listings]
     new_listings = []
+
+    # loop over listings and check if in database
     for lstng in spider_output:
-        listing = lstng['text']
-        if listing not in all_listings:
+        listing = lstng['street_name']
+        if listing not in all_listing_names:
+
+            # append new listings to complete database and separate list
             print("adding new listing!!!: ", listing)
-            all_listings.append(listing)
-            base_html = "https://www.funda.nl"
-            new_listings.append(base_html + listing)
+            all_listings.append(lstng)
+            new_listings.append(lstng)
   
     return all_listings, new_listings
 
 ######## SCRAPY SPIDER FUNCTIONS #######
 def run_spider(spider, url_list):
+    '''function to run a spider job and return dictionaries in list'''
     funda_job = Job(spider, start_urls = url_list)
     processor = Processor(settings=None)
     fetched_listings = processor.run(funda_job)
-    return fetched_listings
+    return [dict(x) for x in fetched_listings]
 
 ############ MAIN FUNCTION #############
 def periodic_checker(database, url_list, token, open_links):
+    '''main function to run spider and send notification if new listing is found'''
     saved_listings = read_json(database)
 
-    # overwrtie if database is empty.
+    # overwrite if database is empty.
     open_links = False if not saved_listings else open_links
 
     # Run spider and check for new listings
     fetched_listings = run_spider(FundaSpider, url_list)
     all_listings, new_listings = check_new_listings(fetched_listings, saved_listings)
 
+    # loop over new listings and send notification and/or open in webbrowser
     for listing in new_listings:
-        t = time.localtime()
-        current_time = time.strftime("%H:%M:%S", t)
-        pushbullet_noti("New listing found! ({})".format(current_time), listing, token)
+        if send_notification:
+            current_time = time.strftime("%H:%M", time.localtime())
+            title = "[{}] {}".format(current_time, listing['street_name'])
+            body = "{}\nvraagprijs: €{}.-\n{}m²/{}m² - {} kamers\n\n{}".format(listing['postal_code'], listing['price'],
+                                                                    listing['living_space'], listing['plot_size'],
+                                                                    listing['nr_of_rooms'], listing['url'])
+            pushbullet_notification(title, body, token)
         if open_links:
-            webbrowser.open(listing)
+            webbrowser.open(listing['url'])
 
-    # Clear database and write new complete list of listings
-    clear_json(database)
-    write_json(database, all_listings)
+    # write new list of listings if new listing(s) found
+    if not new_listings:
+        write_json(database, all_listings)
 
 ############### VARIABLES ##############
 one_loop = True
-open_links = False
-database = "listing_database.json"
+open_links = True
+send_notification = True
+database = "listing_database.jsonl"
 url_list = ['https://www.funda.nl/koop/gemeente-den-bosch/200000-400000/dakterras/tuin/sorteer-datum-af/',
             'https://www.funda.nl/koop/gemeente-vught/200000-400000/dakterras/tuin/sorteer-datum-af/']
 token = config.PUSHBULLET_TOKEN
@@ -99,7 +116,6 @@ if __name__ == "__main__":
     else:
         schedule.every(15).minutes.do(periodic_checker, database = database, url_list = url_list, 
                                                         token = token, open_links=open_links)
-
         while True:
             schedule.run_pending()
             time.sleep(1)

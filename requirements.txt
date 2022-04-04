@@ -1,0 +1,4 @@
+Scrapy==2.6.1
+scrapyscript==1.1.5
+requests==2.27.1
+schedule==1.1.0
