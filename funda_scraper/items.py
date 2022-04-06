@@ -1,5 +1,5 @@
 from scrapy.item import Item, Field
-from scrapy.loader.processors import MapCompose, TakeFirst
+from itemloaders.processors import TakeFirst, MapCompose
 import re
 
 def clean_and_strip(text):
