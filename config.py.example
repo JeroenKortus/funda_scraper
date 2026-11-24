@@ -1,0 +1,27 @@
+# Notion Configuration
+# Replace these with your actual values:
+
+# Your Notion integration token (starts with 'secret_')
+NOTION_TOKEN = "..."
+
+# Your Notion database ID (from the database URL)
+NOTION_DATABASE_ID = "..."
+
+# Pushover Configuration for iPhone notifications
+PUSHOVER_USER_KEY = "..."
+PUSHOVER_API_TOKEN = "..."
+
+# Instructions:
+# 1. Go to https://www.notion.so/my-integrations
+# 2. Create a new integration called "Funda Scraper"
+# 3. Copy the "Internal Integration Token" and paste it above
+# 4. Create a database in Notion with columns: Street Name (Title), Price (Text), URL (URL), Found Date (Date), Status (Select)
+# 5. Share the database with your integration
+# 6. Copy the database ID from the URL and paste it above 
+
+# Pushover Setup Instructions:
+# 1. Download "Pushover" app from App Store
+# 2. Create account at https://pushover.net
+# 3. Your User Key is shown on the main page - copy it above
+# 4. Click "Create an Application/API Token", name it "Funda Scraper"
+# 5. Copy the API Token and paste it above

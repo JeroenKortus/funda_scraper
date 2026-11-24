@@ -1,4 +1,5 @@
-Scrapy==2.6.1
-scrapyscript==1.1.5
-requests==2.27.1
-schedule==1.1.0
+schedule==1.2.0
+selenium==4.15.2
+webdriver-manager==4.0.1
+notion-client==2.2.1
+requests==2.31.0

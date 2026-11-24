@@ -3,3 +3,4 @@ __pycache__/
 .DS_Store
 listing_database.jsonl
 blog/
+.venv
